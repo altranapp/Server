@@ -1,4 +1,4 @@
-﻿const API = "https://crypto-app-y5vn.onrender.com/api";
+  const API = "https://crypto-app-y5vn.onrender.com/api";
 
 // REGISTER
 async function register() {
@@ -102,4 +102,4 @@ async function submitKYC() {
 // AUTO LOAD
 if (window.location.pathname.includes("dashboard")) {
   loadBalance();
-}
+    }
