@@ -1,28 +1,55 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+const userSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
 
-  balance: { type: Number, default: 0 },
+    password: {
+      type: String,
+      required: true,
+    },
 
-  role: {
-    type: String,
-    enum: ['user', 'support', 'admin', 'super_admin'],
-    default: 'user'
+    role: {
+      type: String,
+      default: "user",
+    },
+
+    balance: {
+      type: Number,
+      default: 0,
+    },
+
+    // KYC fields
+    name: {
+      type: String,
+      default: "",
+    },
+
+    country: {
+      type: String,
+      default: "",
+    },
+
+    phone: {
+      type: String,
+      default: "",
+    },
+
+    sex: {
+      type: String,
+      default: "",
+    },
+
+    kycStatus: {
+      type: String,
+      default: "not_submitted", // not_submitted | pending | approved | rejected
+    },
   },
+  { timestamps: true }
+);
 
-  // KYC
-  name: String,
-  country: String,
-  phone: String,
-  sex: String,
-
-  kycStatus: {
-    type: String,
-    enum: ['not_submitted', 'pending', 'approved', 'rejected'],
-    default: 'not_submitted'
-  }
-}, { timestamps: true });
-
-module.exports = mongoose.model('User', userSchema);
+export default mongoose.model("User", userSchema);
