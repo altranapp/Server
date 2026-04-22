@@ -1,8 +1,10 @@
-const router = require('express').Router();
-const User = require('../models/User');
+import express from "express";
+import User from "../models/User.js";
+
+const router = express.Router();
 
 // Submit KYC
-router.post('/submit', async (req, res) => {
+router.post("/submit", async (req, res) => {
   try {
     const { userId, name, country, phone, sex } = req.body;
 
@@ -12,8 +14,7 @@ router.post('/submit', async (req, res) => {
     user.country = country;
     user.phone = phone;
     user.sex = sex;
-
-    user.kycStatus = 'pending';
+    user.kycStatus = "pending";
 
     await user.save();
 
@@ -24,4 +25,4 @@ router.post('/submit', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
