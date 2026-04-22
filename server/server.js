@@ -1,6 +1,8 @@
 import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import cors from "cors";
+app.use(cors());
 
 import authRoutes from "./routes/auth.js";
 import userRoutes from "./routes/user.js";
@@ -24,8 +26,8 @@ app.get("/", (req, res) => {
 });
 
 // DB CONNECT
-mongoose.connect(process.env.MONGO_URI)
-.then(() => {
+MONGO_URI= mongodb+srv://altranapp:6XdeBKOvzzUMjxr6@cluster0.mongodb.net/?crypto-app
+JWT_SECRET = HL6I0ra7k0JVq6x9f0jjGQrOksPkCjFi=> {
   console.log("MongoDB Connected");
 
   app.listen(process.env.PORT || 5000, () => {
