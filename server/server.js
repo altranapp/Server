@@ -21,11 +21,6 @@ app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/kyc", kycRoutes);
 
-// TEST ROUTE
-app.get("/", (req, res) => {
-  res.send("API Running");
-});
-
 // CONNECT DATABASE
 mongoose.connect(process.env.MONGO_URI)
 .then(() => {
@@ -42,6 +37,15 @@ import path from "path";
 
 app.use(express.static("public"));
 
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve("public/index.html"));
+});
+import path from "path";
+
+// Serve frontend
+app.use(express.static("public"));
+
+// Catch all routes → show frontend
 app.get("*", (req, res) => {
   res.sendFile(path.resolve("public/index.html"));
 });
