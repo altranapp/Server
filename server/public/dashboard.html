@@ -6,16 +6,42 @@
 </head>
 <body>
 
-<h2>Dashboard</h2>
+<h1>Dashboard</h1>
 
-<p>Balance: <span id="balance">0</span></p>
-
-<input id="amount" placeholder="Amount">
-<button onclick="deposit()">Deposit</button>
-<button onclick="withdraw()">Withdraw</button>
+<p id="userInfo">Loading...</p>
 
 <button onclick="logout()">Logout</button>
 
-<script src="app.js"></script>
+<script>
+const API = "https://crypto-app-y5vn.onrender.com";
+
+async function loadUser() {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  const res = await fetch(`${API}/api/user/profile`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  const data = await res.json();
+
+  document.getElementById("userInfo").innerText =
+    "User ID: " + (data._id || "No data");
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = "index.html";
+}
+
+loadUser();
+</script>
+
 </body>
 </html>
