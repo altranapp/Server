@@ -1,9 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>User Dashboard</title>
+
+  <!-- LINK YOUR CSS HERE -->
+  <link rel="stylesheet" href="style.css" />
+
+  <style>
+    body {
+      background: #0b1e3c;
+      font-family: Arial;
+      color: white;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: #142a52;
+      padding: 20px;
+      margin: 15px 0;
+      border-radius: 10px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin: 5px 0;
+      background: gold;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: none;
+    }
+  </style>
 </head>
 <body>
 
@@ -11,87 +54,79 @@
 
   <h2>User Dashboard</h2>
 
+  <!-- ACCOUNT INFO -->
   <div class="card">
     <h3>Account</h3>
-    <p id="email"></p>
-    <p class="balance" id="balance">$0</p>
+    <p id="email">Loading...</p>
+    <h2 id="balance">$0</h2>
     <p id="tier">Tier: None</p>
     <p id="profit">Profit: 0%</p>
   </div>
 
-<div class="card">
-  <h3>Select Tier</h3>
+  <!-- SELECT TIER -->
+  <div class="card">
+    <h3>Select Tier</h3>
 
-  <button onclick="selectTier(1)">Tier 1 ($300)</button>
-  <button onclick="selectTier(2)">Tier 2 ($500)</button>
-  <button onclick="selectTier(3)">Tier 3 ($1000)</button>
-</div>
+    <!-- 🔥 THIS IS WHERE YOUR BUTTONS GO -->
+    <button onclick="selectTier(1)">Tier 1 ($300)</button>
+    <button onclick="selectTier(2)">Tier 2 ($500)</button>
+    <button onclick="selectTier(3)">Tier 3 ($1000)</button>
+  </div>
 
+  <!-- DEPOSIT -->
   <div class="card">
     <h3>Deposit</h3>
-    <input id="depositAmount" type="number" placeholder="Amount">
+    <input type="number" id="depositAmount" placeholder="Amount" />
     <button onclick="deposit()">Request Deposit</button>
   </div>
 
+  <!-- WITHDRAW -->
   <div class="card">
     <h3>Withdraw</h3>
-    <input id="withdrawAmount" type="number" placeholder="Amount">
+    <input type="number" id="withdrawAmount" placeholder="Amount" />
     <button onclick="withdraw()">Request Withdraw</button>
   </div>
 
+  <!-- HISTORY -->
   <div class="card">
     <h3>History</h3>
     <div id="history"></div>
   </div>
 
+  <!-- LOGOUT -->
   <button onclick="logout()">Logout</button>
 
 </div>
 
 <script>
-  async function selectTier(tier) {
-  const token = localStorage.getItem("token");
-
-  const res = await fetch("/api/user/select-tier", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer " + token
-    },
-    body: JSON.stringify({ tier })
-  });
-
-  const data = await res.json();
-  alert(data.message);
-  loadUser();
-  }
-const API = "https://crypto-app-y5vn.onrender.com";
+const API = "/api/user";
 const token = localStorage.getItem("token");
 
-// PROTECT PAGE
-if (!token) window.location.href = "index.html";
-
-// LOAD USER
+/* ========================
+   LOAD USER DATA
+======================== */
 async function loadUser() {
-  const res = await fetch(API + "/api/user/profile", {
-    headers: { Authorization: "Bearer " + token }
+  const res = await fetch(`${API}/me`, {
+    headers: { Authorization: token }
   });
 
   const data = await res.json();
 
-  email.innerText = data.email;
-  balance.innerText = "$" + data.balance;
-  tier.innerText = "Tier: " + (data.tier || "None");
-  profit.innerText = "Profit: " + (data.dailyProfitRate * 100 || 0) + "%";
+  document.getElementById("email").innerText = data.email;
+  document.getElementById("balance").innerText = "$" + data.balance;
+  document.getElementById("tier").innerText = "Tier: " + (data.tier || "None");
+  document.getElementById("profit").innerText = "Profit: " + (data.profit || 0) + "%";
 }
 
-// SELECT TIER
+/* ========================
+   SELECT TIER
+======================== */
 async function selectTier(tier) {
-  const res = await fetch(API + "/api/user/select-tier", {
+  const res = await fetch(`${API}/tier`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer " + token
+      Authorization: token
     },
     body: JSON.stringify({ tier })
   });
@@ -101,15 +136,17 @@ async function selectTier(tier) {
   loadUser();
 }
 
-// DEPOSIT
+/* ========================
+   DEPOSIT
+======================== */
 async function deposit() {
-  const amount = Number(depositAmount.value);
+  const amount = document.getElementById("depositAmount").value;
 
-  const res = await fetch(API + "/api/user/request-deposit", {
+  const res = await fetch(`${API}/deposit`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer " + token
+      Authorization: token
     },
     body: JSON.stringify({ amount })
   });
@@ -118,15 +155,17 @@ async function deposit() {
   alert(data.message);
 }
 
-// WITHDRAW
+/* ========================
+   WITHDRAW
+======================== */
 async function withdraw() {
-  const amount = Number(withdrawAmount.value);
+  const amount = document.getElementById("withdrawAmount").value;
 
-  const res = await fetch(API + "/api/user/request-withdraw", {
+  const res = await fetch(`${API}/withdraw`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer " + token
+      Authorization: token
     },
     body: JSON.stringify({ amount })
   });
@@ -135,31 +174,40 @@ async function withdraw() {
   alert(data.message);
 }
 
-// HISTORY
+/* ========================
+   LOAD HISTORY
+======================== */
 async function loadHistory() {
-  const res = await fetch(API + "/api/user/transactions", {
-    headers: { Authorization: "Bearer " + token }
+  const res = await fetch(`${API}/history`, {
+    headers: { Authorization: token }
   });
 
   const data = await res.json();
 
-  let html = "";
-  data.forEach(tx => {
-    html += `<p>${tx.type} - $${tx.amount} (${tx.status})</p>`;
-  });
+  const historyDiv = document.getElementById("history");
+  historyDiv.innerHTML = "";
 
-  history.innerHTML = html;
+  data.forEach(tx => {
+    historyDiv.innerHTML += `
+      <p>${tx.type} - $${tx.amount} - ${tx.status}</p>
+    `;
+  });
 }
 
-// LOGOUT
+/* ========================
+   LOGOUT
+======================== */
 function logout() {
   localStorage.removeItem("token");
-  window.location.href = "index.html";
+  window.location.href = "/";
 }
 
-// INIT
+/* ========================
+   INIT
+======================== */
 loadUser();
 loadHistory();
+
 </script>
 
 </body>
