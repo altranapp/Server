@@ -1,3 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <style>
+    body {
+      background: #0b1a33;
+      color: white;
+      text-align: center;
+      font-family: Arial;
+      padding-top: 50px;
+    }
+
+    button {
+      padding: 10px;
+      background: gold;
+      border: none;
+      width: 200px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Dashboard</h1>
+<p id="status">Loading...</p>
+
+<button onclick="logout()">Logout</button>
+
 <script>
 const API = "https://crypto-app-y5vn.onrender.com";
 
@@ -11,24 +40,23 @@ async function loadDashboard() {
   try {
     const res = await fetch(`${API}/api/user/profile`, {
       headers: {
-        Authorization: `Bearer ${token}`
+        "Authorization": "Bearer " + token
       }
     });
 
     const data = await res.json();
 
-    console.log("PROFILE:", data); // 👈 debug
+    console.log("DATA:", data);
 
-    if (!res.ok) throw new Error();
+    if (!res.ok) throw new Error("Failed");
 
-    document.body.innerHTML = `
-      <h1>Dashboard</h1>
-      <p>Email: ${data.email}</p>
-      <p>Balance: $${data.balance || 0}</p>
-      <button onclick="logout()">Logout</button>
+    document.getElementById("status").innerHTML = `
+      Email: ${data.email}<br>
+      Balance: $${data.balance || 0}
     `;
   } catch (err) {
-    alert("Session expired");
+    console.error(err);
+    alert("Session expired or error");
     logout();
   }
 }
@@ -40,3 +68,6 @@ function logout() {
 
 loadDashboard();
 </script>
+
+</body>
+</html>
