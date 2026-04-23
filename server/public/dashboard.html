@@ -1,47 +1,44 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Dashboard</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<h1>Dashboard</h1>
-
-<p id="userInfo">Loading...</p>
-
-<button onclick="logout()">Logout</button>
-
 <script>
 const API = "https://crypto-app-y5vn.onrender.com";
 
-async function loadUser() {
-  const token = localStorage.getItem("token");
+const token = localStorage.getItem("token");
 
-  if (!token) {
-    window.location.href = "index.html";
-    return;
-  }
+if (!token) {
+  window.location.href = "/";
+}
 
-  const res = await fetch(`${API}/api/user/profile`, {
-    headers: {
-      "Authorization": `Bearer ${token}`
+// Fetch user data
+async function loadDashboard() {
+  try {
+    const res = await fetch(`${API}/api/user/profile`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || "Failed");
     }
-  });
 
-  const data = await res.json();
-
-  document.getElementById("userInfo").innerText =
-    "User ID: " + (data._id || "No data");
+    document.body.innerHTML = `
+      <h1>Dashboard</h1>
+      <p><strong>Email:</strong> ${data.email}</p>
+      <p><strong>Balance:</strong> $${data.balance || 0}</p>
+      <button onclick="logout()">Logout</button>
+    `;
+  } catch (err) {
+    console.error(err);
+    alert("Session expired. Login again.");
+    logout();
+  }
 }
 
 function logout() {
-  localStorage.clear();
-  window.location.href = "index.html";
+  localStorage.removeItem("token");
+  window.location.href = "/";
 }
 
-loadUser();
+loadDashboard();
 </script>
-
-</body>
-</html>
