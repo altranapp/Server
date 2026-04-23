@@ -1,8 +1,8 @@
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0f172a;
+  background: #0b1a33;
+  font-family: Arial;
   color: white;
+  margin: 0;
 }
 
 .container {
@@ -17,35 +17,27 @@ h1 {
 }
 
 .card {
-  background: #1e293b;
+  background: #1c2b4a;
   padding: 15px;
-  margin: 15px 0;
+  margin-top: 15px;
   border-radius: 10px;
 }
 
-input, select {
+input {
   width: 100%;
   padding: 10px;
-  margin: 8px 0;
-  border: none;
-  border-radius: 5px;
+  margin-top: 10px;
 }
 
 button {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
+  margin-top: 10px;
   background: gold;
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  margin-top: 10px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: orange;
 }
 
 .logout {
+  margin-top: 20px;
   background: red;
 }
