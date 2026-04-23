@@ -1,44 +1,20 @@
-import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import cors from "cors";
-import path from "path";
-import { fileURLToPath } from "url";
-
-import authRoutes from "./routes/auth.js";
-import userRoutes from "./routes/user.js";
-import adminRoutes from "./routes/admin.js";
+import app from "./app.js";
 
 dotenv.config();
 
-const app = express();
+const PORT = process.env.PORT || 10000;
 
-// Fix __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-app.use(cors());
-app.use(express.json());
-
-// API
-app.use("/api/auth", authRoutes);
-app.use("/api/user", userRoutes);
-app.use("/api/admin", adminRoutes);
-
-// STATIC FRONTEND
-app.use(express.static(path.join(__dirname, "public")));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-// DB + START
+// Connect DB then start server
 mongoose.connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("DB connected");
+    console.log("✅ MongoDB Connected");
 
-    app.listen(process.env.PORT || 10000, () => {
-      console.log("Server running");
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
     });
   })
-  .catch(err => console.log(err));
+  .catch(err => {
+    console.error("❌ DB ERROR:", err);
+  });
