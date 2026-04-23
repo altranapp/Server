@@ -6,48 +6,15 @@
 </head>
 <body>
 
-<div class="container">
-  <h1>Dashboard</h1>
+<h2>Dashboard</h2>
 
-  <div class="card">
-    <h2 id="balance">Balance: $0</h2>
-    <button onclick="loadBalance()">Refresh Balance</button>
-  </div>
+<p>Balance: <span id="balance">0</span></p>
 
-  <div class="card">
-    <h3>Deposit</h3>
-    <input id="depositAmount" placeholder="Amount">
-    <button onclick="deposit()">Deposit</button>
-  </div>
+<input id="amount" placeholder="Amount">
+<button onclick="deposit()">Deposit</button>
+<button onclick="withdraw()">Withdraw</button>
 
-  <div class="card">
-    <h3>Withdraw</h3>
-    <input id="withdrawAmount" placeholder="Amount">
-    <button onclick="withdraw()">Withdraw</button>
-  </div>
-
-  <div class="card">
-    <h3>KYC Verification</h3>
-    <input id="name" placeholder="Full Name">
-    <select id="country">
-      <option value="">Select Country</option>
-      <option>Nigeria</option>
-      <option>USA</option>
-      <option>UK</option>
-      <option>Canada</option>
-      <option>India</option>
-    </select>
-    <input id="phone" placeholder="Phone">
-    <select id="sex">
-      <option value="">Sex</option>
-      <option>Male</option>
-      <option>Female</option>
-    </select>
-    <button onclick="submitKYC()">Submit KYC</button>
-  </div>
-
-  <button class="logout" onclick="logout()">Logout</button>
-</div>
+<button onclick="logout()">Logout</button>
 
 <script src="app.js"></script>
 </body>
