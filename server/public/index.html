@@ -24,5 +24,29 @@
 
 <script src="app.js"></script>
 
+<script>
+async function login() {
+  const email = document.getElementById("logEmail").value;
+  const password = document.getElementById("logPassword").value;
+
+  const res = await fetch("https://crypto-app-y5vn.onrender.com/api/auth/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+    localStorage.setItem("token", data.token); // ✅ save token
+    window.location.href = "dashboard.html";   // ✅ go to dashboard
+  } else {
+    alert(data.message);
+  }
+}
+</script>  
+
 </body>
 </html>
