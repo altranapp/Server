@@ -7,202 +7,155 @@
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #0b1a2f;
-      color: #fff;
       margin: 0;
-      padding: 20px;
+      font-family: Arial;
+      background: #0b132b;
+      color: white;
     }
 
-    h1 {
+    .header {
+      background: #1c2541;
+      padding: 15px;
       text-align: center;
-      color: gold;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 20px;
     }
 
     .card {
-      background: #1e2a3a;
+      background: #1c2541;
       padding: 20px;
+      margin-bottom: 15px;
       border-radius: 10px;
-      margin: 15px auto;
-      max-width: 400px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      background: gold;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
     }
 
     input {
       width: 100%;
       padding: 10px;
-      margin: 8px 0;
-      border: none;
-      border-radius: 5px;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      background: gold;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    button:hover {
-      opacity: 0.9;
-    }
-
-    .logout {
-      background: red;
-      margin-top: 20px;
+      margin-top: 10px;
     }
   </style>
 </head>
+
 <body>
 
-  <h1>Dashboard</h1>
+<div class="header">Dashboard</div>
 
-  <!-- USER INFO -->
+<div class="container">
+
   <div class="card">
-    <h3>User Info</h3>
-    <p>Email: <span id="userEmail">Loading...</span></p>
-    <p>Balance: $<span id="balance">0</span></p>
+    <h3>Welcome</h3>
+    <p id="userEmail">Loading...</p>
   </div>
 
-  <!-- DEPOSIT -->
+  <div class="card">
+    <h3>Balance</h3>
+    <p id="balance">$0</p>
+  </div>
+
   <div class="card">
     <h3>Deposit</h3>
-    <input type="number" id="depositAmount" placeholder="Enter amount"/>
+    <input type="number" id="depositAmount" placeholder="Amount"/>
     <button onclick="deposit()">Deposit</button>
   </div>
 
-  <!-- WITHDRAW -->
   <div class="card">
     <h3>Withdraw</h3>
-    <input type="number" id="withdrawAmount" placeholder="Enter amount"/>
+    <input type="number" id="withdrawAmount" placeholder="Amount"/>
     <button onclick="withdraw()">Withdraw</button>
   </div>
 
-  <!-- LOGOUT -->
-  <div class="card">
-    <button class="logout" onclick="logout()">Logout</button>
-  </div>
+  <button onclick="logout()">Logout</button>
 
-  <script>
-    let userId = null;
+</div>
 
-    // LOAD USER DATA
-    <script>
-async function loadDashboard() {
+<script>
+const API = "https://crypto-app-y5vn.onrender.com";
+
+async function loadUser() {
   const token = localStorage.getItem("token");
 
   if (!token) {
-    window.location.href = "/";
+    window.location.href = "index.html";
     return;
   }
 
   try {
-    const res = await fetch("/api/user/profile", {
+    const res = await fetch(API + "/api/user/profile", {
       headers: {
-        "Authorization": "Bearer " + token
+        Authorization: "Bearer " + token
       }
     });
 
-    const text = await res.text(); // 👈 IMPORTANT DEBUG
+    const user = await res.json();
 
-    console.log("RAW RESPONSE:", text);
-
-    const data = JSON.parse(text); // safe parse
-
-    if (!res.ok) {
-      alert(data.message || "Error");
-      return;
-    }
-
-    document.body.innerHTML = `
-      <h2 style="color:gold;text-align:center;">Dashboard</h2>
-      <p style="text-align:center;">Email: ${data.email}</p>
-      <p style="text-align:center;">Balance: $${data.balance}</p>
-      <button onclick="logout()">Logout</button>
-    `;
+    document.getElementById("userEmail").innerText = user.email;
+    document.getElementById("balance").innerText = "$" + user.balance;
 
   } catch (err) {
-    console.error("CRASH:", err);
-    alert("Something broke — check console");
+    alert("Session expired");
+    logout();
   }
 }
 
-function logout() {
-  localStorage.removeItem("token");
-  window.location.href = "/";
+async function deposit() {
+  const amount = document.getElementById("depositAmount").value;
+
+  const res = await fetch(API + "/api/user/deposit", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userId: localStorage.getItem("userId"),
+      amount: Number(amount)
+    })
+  });
+
+  const data = await res.json();
+  alert(data.message);
+  loadUser();
 }
 
-loadDashboard();
+async function withdraw() {
+  const amount = document.getElementById("withdrawAmount").value;
+
+  const res = await fetch(API + "/api/user/withdraw", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userId: localStorage.getItem("userId"),
+      amount: Number(amount)
+    })
+  });
+
+  const data = await res.json();
+  alert(data.message);
+  loadUser();
+}
+
+function logout() {
+  localStorage.clear();
+  window.location.href = "index.html";
+}
+
+loadUser();
 </script>
-  
-    // DEPOSIT FUNCTION
-    async function deposit() {
-      const amount = Number(document.getElementById("depositAmount").value);
-
-      if (!amount) {
-        alert("Enter amount");
-        return;
-      }
-
-      const res = await fetch("/api/user/deposit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          userId,
-          amount
-        })
-      });
-
-      const data = await res.json();
-
-      alert(data.message);
-      document.getElementById("balance").innerText = data.balance;
-    }
-
-    // WITHDRAW FUNCTION
-    async function withdraw() {
-      const amount = Number(document.getElementById("withdrawAmount").value);
-
-      if (!amount) {
-        alert("Enter amount");
-        return;
-      }
-
-      const res = await fetch("/api/user/withdraw", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          userId,
-          amount
-        })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        alert(data.message);
-        return;
-      }
-
-      alert(data.message);
-      document.getElementById("balance").innerText = data.balance;
-    }
-
-    // LOGOUT
-    function logout() {
-      localStorage.removeItem("token");
-      window.location.href = "/";
-    }
-
-    // INIT
-    loadDashboard();
-  </script>
 
 </body>
 </html>
