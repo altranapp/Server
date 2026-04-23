@@ -90,37 +90,40 @@
 
     // LOAD USER DATA
     async function loadDashboard() {
-      const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
-      if (!token) {
-        window.location.href = "/";
-        return;
+  console.log("Token:", token);
+
+  if (!token) {
+    window.location.href = "/";
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/user/profile", {
+      headers: {
+        "Authorization": "Bearer " + token
       }
+    });
 
-      try {
-        const res = await fetch("/api/user/profile", {
-          headers: {
-            "Authorization": "Bearer " + token
-          }
-        });
+    console.log("Response status:", res.status);
 
-        const data = await res.json();
+    const data = await res.json();
+    console.log("Response data:", data);
 
-        if (!res.ok) {
-          alert("Session expired");
-          localStorage.removeItem("token");
-          window.location.href = "/";
-          return;
-        }
-
-        document.getElementById("userEmail").innerText = data.email;
-        document.getElementById("balance").innerText = data.balance;
-        userId = data._id;
-
-      } catch (err) {
-        alert("Error loading dashboard");
-      }
+    if (!res.ok) {
+      alert(data.message || "Error loading profile");
+      return;
     }
+
+    document.getElementById("userEmail").innerText = data.email;
+    document.getElementById("balance").innerText = data.balance;
+
+  } catch (err) {
+    console.error("ERROR:", err);
+    alert("Dashboard failed to load");
+  }
+}
 
     // DEPOSIT FUNCTION
     async function deposit() {
