@@ -32,7 +32,7 @@ app.use("/api/kyc", kycRoutes);
 app.use(express.static(path.join(__dirname, "public")));
 
 // ✅ HANDLE FRONTEND ROUTES
-app.get("*", (req, res) => {
+app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
