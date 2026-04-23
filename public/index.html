@@ -1,18 +1,103 @@
-<input id="loginEmail" type="email">
-<input id="loginPassword" type="password">
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Crypto Investment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<button onclick="login()">Login</button>
+  <style>
+    body {
+      background: #0b1d3a;
+      font-family: Arial;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .card {
+      background: #132a4a;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: gold;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    h2 {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- REGISTER -->
+  <div class="card">
+    <h2>Register</h2>
+    <input id="regEmail" placeholder="Email">
+    <input id="regPassword" type="password" placeholder="Password">
+    <button onclick="register()">Register</button>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="card">
+    <h2>Login</h2>
+    <input id="logEmail" placeholder="Email">
+    <input id="logPassword" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+  </div>
+
+</div>
 
 <script>
-async function login() {
-  const email = document.getElementById("loginEmail").value;
-  const password = document.getElementById("loginPassword").value;
+const API = "/api/user";
 
-  const res = await fetch("/api/user/login", {
+// REGISTER
+async function register() {
+  const email = document.getElementById("regEmail").value;
+  const password = document.getElementById("regPassword").value;
+
+  const res = await fetch(API + "/register", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await res.json();
+  alert(data.message || "Registered");
+}
+
+// LOGIN
+async function login() {
+  const email = document.getElementById("logEmail").value;
+  const password = document.getElementById("logPassword").value;
+
+  const res = await fetch(API + "/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
     body: JSON.stringify({ email, password })
   });
 
@@ -20,10 +105,13 @@ async function login() {
 
   if (data.token) {
     localStorage.setItem("token", data.token);
-    alert("Login success");
-    window.location.href = "dashboard.html";
+    alert("Login successful");
+    window.location.href = "/dashboard.html";
   } else {
-    alert(data.message);
+    alert(data.message || "Login failed");
   }
 }
 </script>
+
+</body>
+</html>
