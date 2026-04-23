@@ -1,11 +1,9 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  email: String,
+  email: { type: String, unique: true },
   password: String,
-  balance: { type: Number, default: 0 },
-  tier: { type: Number, default: null },
-  role: { type: String, default: "user" }
+  balance: { type: Number, default: 0 }
 });
 
 export default mongoose.model("User", userSchema);
