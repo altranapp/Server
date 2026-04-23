@@ -2,57 +2,54 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
 
 // REGISTER
 router.post("/register", async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const hashed = await bcrypt.hash(password, 10);
+    const exist = await User.findOne({ email });
+    if (exist) return res.json({ message: "User already exists" });
 
-  const user = await User.create({
-    email,
-    password: hashed
-  });
+    const hashed = await bcrypt.hash(password, 10);
 
-  res.json({ message: "Registered successfully" });
+    const user = new User({
+      email,
+      password: hashed
+    });
+
+    await user.save();
+
+    res.json({ message: "Registered successfully" });
+
+  } catch (err) {
+    res.json({ message: "Error", error: err.message });
+  }
 });
 
 // LOGIN
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
+    const user = await User.findOne({ email });
+    if (!user) return res.json({ message: "User not found" });
 
-  if (!user) return res.status(400).json({ message: "User not found" });
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.json({ message: "Wrong password" });
 
-  const match = await bcrypt.compare(password, user.password);
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET
+    );
 
-  if (!match) return res.status(400).json({ message: "Wrong password" });
+    res.json({ token });
 
-  const token = jwt.sign(
-    { id: user._id, role: user.role },
-    process.env.JWT_SECRET
-  );
-
-  res.json({ token, user });
-});
-
-// PROFILE
-router.get("/profile", protect, async (req, res) => {
-  const user = await User.findById(req.user.id);
-  res.json(user);
-});
-
-// SELECT TIER
-router.post("/tier", protect, async (req, res) => {
-  const { tier } = req.body;
-
-  await User.findByIdAndUpdate(req.user.id, { tier });
-
-  res.json({ message: "Tier selected" });
+  } catch (err) {
+    res.json({ message: "Error", error: err.message });
+  }
 });
 
 export default router;
