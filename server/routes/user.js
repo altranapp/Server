@@ -1,7 +1,30 @@
 import express from "express";
+import jwt from "jsonwebtoken"; // ✅ ADD THIS
 import User from "../models/User.js";
 
 const router = express.Router();
+
+// ✅ ADD PROFILE ROUTE HERE
+router.get("/profile", async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({ message: "No token" });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.id).select("-password");
+
+    res.json(user);
+
+  } catch (err) {
+    res.status(401).json({ message: "Invalid token" });
+  }
+});
 
 // Get balance
 router.get("/balance/:id", async (req, res) => {
@@ -13,7 +36,7 @@ router.get("/balance/:id", async (req, res) => {
   }
 });
 
-// Deposit (demo)
+// Deposit
 router.post("/deposit", async (req, res) => {
   try {
     const { userId, amount } = req.body;
