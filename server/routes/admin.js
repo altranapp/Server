@@ -1,76 +1,43 @@
 import express from "express";
 import User from "../models/User.js";
+import Transaction from "../models/Transaction.js";
+import { protect, adminOnly } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// Get all users
-router.get("/users", async (req, res) => {
-  try {
-    const users = await User.find();
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+// USERS
+router.get("/users", protect, adminOnly, async (req, res) => {
+  res.json(await User.find());
 });
 
-// Get KYC requests
-router.get("/kyc", async (req, res) => {
-  try {
-    const users = await User.find({
-      kycStatus: { $ne: "not_submitted" },
-    });
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+// TRANSACTIONS
+router.get("/transactions", protect, adminOnly, async (req, res) => {
+  res.json(await Transaction.find());
 });
 
-// Approve KYC
-router.post("/kyc/approve", async (req, res) => {
-  try {
-    const { userId } = req.body;
+// APPROVE
+router.post("/approve/:id", protect, adminOnly, async (req, res) => {
+  const tx = await Transaction.findById(req.params.id);
+  const user = await User.findById(tx.userId);
 
-    const user = await User.findById(userId);
-    user.kycStatus = "approved";
+  if (tx.type === "deposit") user.balance += tx.amount;
+  if (tx.type === "withdraw") user.balance -= tx.amount;
 
-    await user.save();
+  tx.status = "approved";
 
-    res.json({ message: "KYC approved" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  await user.save();
+  await tx.save();
+
+  res.json({ message: "Approved" });
 });
 
-// Reject KYC
-router.post("/kyc/reject", async (req, res) => {
-  try {
-    const { userId } = req.body;
+// REJECT
+router.post("/reject/:id", protect, adminOnly, async (req, res) => {
+  const tx = await Transaction.findById(req.params.id);
+  tx.status = "rejected";
+  await tx.save();
 
-    const user = await User.findById(userId);
-    user.kycStatus = "rejected";
-
-    await user.save();
-
-    res.json({ message: "KYC rejected" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Change role
-router.post("/set-role", async (req, res) => {
-  try {
-    const { userId, role } = req.body;
-
-    const user = await User.findById(userId);
-    user.role = role;
-
-    await user.save();
-
-    res.json({ message: "Role updated" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  res.json({ message: "Rejected" });
 });
 
 export default router;
