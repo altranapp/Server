@@ -1,112 +1,193 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0b1a2f;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: gold;
+    }
+
+    .card {
+      background: #1e2a3a;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 15px auto;
+      max-width: 400px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: gold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .logout {
+      background: red;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
+  <h1>Dashboard</h1>
 
-  <h1>Crypto Dashboard</h1>
-
+  <!-- USER INFO -->
   <div class="card">
-    <p><strong>Email:</strong> <span id="email">Loading...</span></p>
-    <p><strong>Balance:</strong> $<span id="balance">0</span></p>
+    <h3>User Info</h3>
+    <p>Email: <span id="userEmail">Loading...</span></p>
+    <p>Balance: $<span id="balance">0</span></p>
   </div>
 
+  <!-- DEPOSIT -->
   <div class="card">
     <h3>Deposit</h3>
-    <input id="depositAmount" placeholder="Amount">
+    <input type="number" id="depositAmount" placeholder="Enter amount"/>
     <button onclick="deposit()">Deposit</button>
   </div>
 
+  <!-- WITHDRAW -->
   <div class="card">
     <h3>Withdraw</h3>
-    <input id="withdrawAmount" placeholder="Amount">
+    <input type="number" id="withdrawAmount" placeholder="Enter amount"/>
     <button onclick="withdraw()">Withdraw</button>
   </div>
 
-  <button class="logout" onclick="logout()">Logout</button>
+  <!-- LOGOUT -->
+  <div class="card">
+    <button class="logout" onclick="logout()">Logout</button>
+  </div>
 
-</div>
+  <script>
+    let userId = null;
 
-<script>
-const API = "https://crypto-app-y5vn.onrender.com";
-const token = localStorage.getItem("token");
+    // LOAD USER DATA
+    async function loadDashboard() {
+      const token = localStorage.getItem("token");
 
-if (!token) {
-  window.location.href = "/";
-}
-
-// Load user
-async function loadDashboard() {
-  try {
-    const res = await fetch(`${API}/api/user/profile`, {
-      headers: {
-        "Authorization": "Bearer " + token
+      if (!token) {
+        window.location.href = "/";
+        return;
       }
-    });
 
-    const data = await res.json();
+      try {
+        const res = await fetch("/api/user/profile", {
+          headers: {
+            "Authorization": "Bearer " + token
+          }
+        });
 
-    document.getElementById("email").innerText = data.email;
-    document.getElementById("balance").innerText = data.balance || 0;
+        const data = await res.json();
 
-    localStorage.setItem("userId", data._id); // save for deposit
+        if (!res.ok) {
+          alert("Session expired");
+          localStorage.removeItem("token");
+          window.location.href = "/";
+          return;
+        }
 
-  } catch (err) {
-    alert("Session expired");
-    logout();
-  }
-}
+        document.getElementById("userEmail").innerText = data.email;
+        document.getElementById("balance").innerText = data.balance;
+        userId = data._id;
 
-// Deposit
-async function deposit() {
-  const amount = Number(document.getElementById("depositAmount").value);
-  const userId = localStorage.getItem("userId");
+      } catch (err) {
+        alert("Error loading dashboard");
+      }
+    }
 
-  const res = await fetch(`${API}/api/user/deposit`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ userId, amount })
-  });
+    // DEPOSIT FUNCTION
+    async function deposit() {
+      const amount = Number(document.getElementById("depositAmount").value);
 
-  const data = await res.json();
+      if (!amount) {
+        alert("Enter amount");
+        return;
+      }
 
-  alert(data.message);
-  loadDashboard();
-}
+      const res = await fetch("/api/user/deposit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId,
+          amount
+        })
+      });
 
-// Withdraw
-async function withdraw() {
-  const amount = Number(document.getElementById("withdrawAmount").value);
-  const userId = localStorage.getItem("userId");
+      const data = await res.json();
 
-  const res = await fetch(`${API}/api/user/withdraw`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ userId, amount })
-  });
+      alert(data.message);
+      document.getElementById("balance").innerText = data.balance;
+    }
 
-  const data = await res.json();
+    // WITHDRAW FUNCTION
+    async function withdraw() {
+      const amount = Number(document.getElementById("withdrawAmount").value);
 
-  alert(data.message);
-  loadDashboard();
-}
+      if (!amount) {
+        alert("Enter amount");
+        return;
+      }
 
-// Logout
-function logout() {
-  localStorage.clear();
-  window.location.href = "/";
-}
+      const res = await fetch("/api/user/withdraw", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId,
+          amount
+        })
+      });
 
-loadDashboard();
-</script>
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message);
+        return;
+      }
+
+      alert(data.message);
+      document.getElementById("balance").innerText = data.balance;
+    }
+
+    // LOGOUT
+    function logout() {
+      localStorage.removeItem("token");
+      window.location.href = "/";
+    }
+
+    // INIT
+    loadDashboard();
+  </script>
 
 </body>
 </html>
