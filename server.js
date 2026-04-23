@@ -1,20 +1,27 @@
+import express from "express";
 import mongoose from "mongoose";
+import cors from "cors";
 import dotenv from "dotenv";
-import app from "./app.js";
+
+import userRoutes from "./routes/user.js";
+import adminRoutes from "./routes/admin.js";
 
 dotenv.config();
 
-const PORT = process.env.PORT || 10000;
+const app = express();
 
-// Connect DB then start server
+app.use(cors());
+app.use(express.json());
+
+// ROUTES
+app.use("/api/user", userRoutes);
+app.use("/api/admin", adminRoutes);
+
+// CONNECT DB
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("✅ MongoDB Connected");
+.then(() => console.log("MongoDB Connected"))
+.catch(err => console.log(err));
 
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
-    });
-  })
-  .catch(err => {
-    console.error("❌ DB ERROR:", err);
-  });
+// START SERVER
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => console.log("Server running on port " + PORT));
