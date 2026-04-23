@@ -1,43 +1,137 @@
-body {
-  background: #0b1a33;
-  font-family: Arial;
-  color: white;
+/* RESET */
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+/* BODY */
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: #0b1a33;
+  color: #ffffff;
+}
+
+/* HEADER */
+h1, h2, h3 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* CONTAINER */
 .container {
-  max-width: 400px;
+  max-width: 500px;
   margin: auto;
   padding: 20px;
 }
 
-h1 {
+/* CARD */
+.card {
+  background: #1c2b4a;
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+/* INPUT */
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  background: #0f213f;
+  color: white;
+}
+
+/* BUTTON */
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 5px;
+  background: gold;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #ffd700cc;
+}
+
+/* SMALL BUTTONS */
+.btn-small {
+  width: auto;
+  padding: 8px 12px;
+  margin-right: 5px;
+}
+
+/* FLEX ROW */
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+/* TEXT */
+.text-center {
   text-align: center;
+}
+
+/* BALANCE */
+.balance {
+  font-size: 28px;
+  font-weight: bold;
   color: gold;
 }
 
-.card {
-  background: #1c2b4a;
+/* STATUS COLORS */
+.success {
+  color: #00ff88;
+}
+
+.error {
+  color: #ff4d4d;
+}
+
+.pending {
+  color: orange;
+}
+
+/* NAVBAR */
+.navbar {
+  background: #121f3d;
   padding: 15px;
-  margin-top: 15px;
-  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
 }
 
-input {
+/* TABLE STYLE (ADMIN) */
+.table {
   width: 100%;
-  padding: 10px;
   margin-top: 10px;
 }
 
-button {
-  width: 100%;
+.table div {
+  background: #162447;
   padding: 10px;
-  margin-top: 10px;
-  background: gold;
-  border: none;
+  margin-bottom: 5px;
+  border-radius: 6px;
 }
 
-.logout {
-  margin-top: 20px;
-  background: red;
+/* SCROLL */
+.scroll {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .container {
+    padding: 10px;
+  }
 }
