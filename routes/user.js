@@ -1,3 +1,7 @@
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
+import Transaction from "../models/Transaction.js";
+
 import express from "express";
 import User from "../models/User.js";
 import Transaction from "../models/Transaction.js";
@@ -22,37 +26,45 @@ router.get("/profile", protect, async (req, res) => {
 });
 
 // SELECT TIER
-router.post("/select-tier", protect, async (req, res) => {
-  const { tier } = req.body;
+router.post("/select-tier", async (req, res) => {
+  try {
+    const { tier } = req.body;
 
-  const user = await User.findById(req.user.id);
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-  if (!TIERS[tier]) return res.json({ message: "Invalid tier" });
+    const user = await User.findById(decoded.id);
+    user.tier = tier;
 
-  if (user.balance < TIERS[tier].min) {
-    return res.json({ message: `Minimum $${TIERS[tier].min}` });
+    await user.save();
+
+    res.json({ message: "Tier selected successfully" });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  user.tier = tier;
-  user.dailyProfitRate = TIERS[tier].rate;
-  user.lastProfitTime = new Date();
-
-  await user.save();
-
-  res.json({ message: "Tier activated" });
 });
 
-// REQUEST DEPOSIT
-router.post("/request-deposit", protect, async (req, res) => {
-  const { amount } = req.body;
 
-  await Transaction.create({
-    userId: req.user.id,
-    type: "deposit",
-    amount
-  });
+// DEPOSIT REQUEST
+router.post("/deposit", async (req, res) => {
+  try {
+    const { amount } = req.body;
 
-  res.json({ message: "Deposit request sent" });
+    const token = req.headers.authorization.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    await Transaction.create({
+      userId: decoded.id,
+      type: "deposit",
+      amount
+    });
+
+    res.json({ message: "Deposit request sent" });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // REQUEST WITHDRAW
