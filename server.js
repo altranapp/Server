@@ -10,18 +10,24 @@ dotenv.config();
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// ROUTES
+// Routes
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 
-// CONNECT DB
+// MongoDB connect
 mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
+.then(() => console.log("✅ MongoDB Connected"))
+.catch(err => console.log("❌ MongoDB Error:", err));
 
-// START SERVER
+// Test route
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
+
+// Server
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log("Server running on port " + PORT));
+app.listen(PORT, () => console.log(`🚀 Server running on ${PORT}`));
